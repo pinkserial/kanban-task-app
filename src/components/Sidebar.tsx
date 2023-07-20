@@ -1,4 +1,4 @@
-import HideSidebarIcon from "@icons/HideSidebarIcon";
+import HideIcon from "@icons/HideIcon";
 import styled from "@mui/material/styles/styled";
 import MuiDrawer, { DrawerProps as MuiDrawerProps } from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
@@ -107,11 +107,7 @@ export default function Sidebar({
           alignItems: "center",
         }}
       >
-        <Button
-          variant="text"
-          startIcon={<HideSidebarIcon />}
-          onClick={onToggle}
-        >
+        <Button variant="text" startIcon={<HideIcon />} onClick={onToggle}>
           <Typography fontWeight="bold">Hide Sidebar</Typography>
         </Button>
       </Box>
