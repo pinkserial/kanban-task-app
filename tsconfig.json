@@ -22,9 +22,11 @@
 
     "paths": {
       "@assets/*": ["./src/assets/*"],
-      "@icons/*": ["./src/components/icons/*"]
+      "@icons/*": ["./src/components/icons/*"],
+      "@components/*": ["./src/components/*"],
+      "@hooks/*": ["./src/hooks/*"]
     }
   },
-  "include": ["src"],
+  "include": ["**/*.ts", "**/*.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

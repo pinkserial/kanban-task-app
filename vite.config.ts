@@ -17,6 +17,16 @@ export default defineConfig({
           new URL("./src/components/icons", import.meta.url)
         ),
       },
+      {
+        find: "@components",
+        replacement: fileURLToPath(
+          new URL("./src/components", import.meta.url)
+        ),
+      },
+      {
+        find: "@hooks",
+        replacement: fileURLToPath(new URL("./src/hooks", import.meta.url)),
+      },
     ],
   },
   plugins: [react(), svgr()],
