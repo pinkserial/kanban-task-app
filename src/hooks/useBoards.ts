@@ -1,45 +1,65 @@
 import { create } from "zustand";
+import { immer } from "zustand/middleware/immer";
+import data from "@assets/data.json";
 
-const defaultBoards: Board[] = [
-  {
-    id: 0,
-    columns: [
-      { title: "Todo", tasks: [] },
-      { title: "Doing", tasks: [] },
-      { title: "Done", tasks: [] },
-    ],
-    name: "Platform Launch",
-  },
-  {
-    id: 1,
-    columns: [
-      { title: "Todo", tasks: [] },
-      { title: "Doing", tasks: [] },
-      { title: "Done", tasks: [] },
-    ],
-    name: "Marketing Plan",
-  },
-  {
-    id: 2,
-    columns: [
-      { title: "Todo", tasks: [] },
-      { title: "Doing", tasks: [] },
-      { title: "Done", tasks: [] },
-    ],
-    name: "Roadmap",
-  },
-];
+type State = {
+  boards: Board[];
+};
 
-export const useBoardStore = create<BoardState>((set) => ({
-  currentBoard: 0,
-  boards: defaultBoards,
-  create: (b: Board) => set((state) => ({ boards: [...state.boards, b] })),
-  edit: (b: Board) =>
-    set((state) => ({
-      boards: state.boards.map((board) => (board.id === b.id ? b : board)),
-    })),
-  delete: (id: number) =>
-    set((state) => ({
-      boards: state.boards.filter((board) => board.id !== id),
-    })),
-}));
+type Actions = {
+  // board actions
+  addBoard: (board: Board) => void;
+  editBoard: (name: string, columns: Column[]) => void;
+  deleteBoard: () => void;
+
+  // task actions
+  addTask: (task: Task) => void;
+  editTask: (idx: number, newTask: Task) => void;
+  deleteTask: (idx: number) => void;
+};
+
+const initialState = {
+  boards: data.boards,
+};
+
+const useBoardStore = create(
+  immer<State & Actions>((set) => ({
+    ...initialState,
+
+    addBoard: (board) =>
+      set((state) => {
+        state.boards.push(board);
+      }),
+
+    editBoard: (name, columns) =>
+      set((state) => {
+        const activeBoard = state.boards.find((board) => board.isActive);
+        if (activeBoard) {
+          activeBoard.name = name;
+          activeBoard.columns = columns;
+        }
+      }),
+
+    deleteBoard: () =>
+      set((state) => {
+        state.boards = state.boards.filter((board) => !board.isActive);
+      }),
+
+    addTask: (task) =>
+      set((state) => {
+        const activeBoard = state.boards.find((board) => board.isActive);
+        const column = activeBoard?.columns.find(
+          (column) => column.name === task.status
+        );
+        if (column) {
+          column.tasks.push(task);
+        }
+      }),
+
+    editTask: (idx, newTask) => set((state) => {}),
+
+    deleteTask: (idx) => set((state) => {}),
+  }))
+);
+
+export default useBoardStore;
