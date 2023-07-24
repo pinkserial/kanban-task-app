@@ -2,7 +2,6 @@ import HideIcon from "@icons/HideIcon";
 import styled from "@mui/material/styles/styled";
 import MuiDrawer, { DrawerProps as MuiDrawerProps } from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
-
 import Typography from "@mui/material/Typography";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -11,21 +10,22 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import BoardIcon from "@icons/BoardIcon";
 import Box from "@mui/material/Box";
-
 import Button from "@mui/material/Button";
-import { useBoardStore } from "@hooks/useBoards";
 import ThemeToggle from "@components/ThemeToggle";
+import useBoardStore from "@hooks/useBoards";
 
 interface DrawerProps extends MuiDrawerProps {
   open: boolean;
 }
 
+export const DrawerWidth = "300px";
+
 const Drawer = styled(MuiDrawer)<DrawerProps>({
-  width: "300px",
+  width: DrawerWidth,
   boxSizing: "border-box",
   flexShrink: 0,
   "& .MuiDrawer-paper": {
-    width: "300px",
+    width: DrawerWidth,
     boxSizing: "border-box",
   },
 });
@@ -79,12 +79,12 @@ function BoardList({ boards }: { boards: Board[] }) {
 
 export default function Sidebar({
   open,
-  onToggle,
+  handleClick,
 }: {
   open: boolean;
-  onToggle: () => void;
+  handleClick: () => void;
 }) {
-  const { boards } = useBoardStore();
+  const boards = useBoardStore((state) => state.boards);
 
   return (
     <Drawer
@@ -107,7 +107,7 @@ export default function Sidebar({
           alignItems: "center",
         }}
       >
-        <Button variant="text" startIcon={<HideIcon />} onClick={onToggle}>
+        <Button variant="text" startIcon={<HideIcon />} onClick={handleClick}>
           <Typography fontWeight="bold">Hide Sidebar</Typography>
         </Button>
       </Box>

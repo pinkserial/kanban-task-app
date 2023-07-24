@@ -8,14 +8,15 @@ type State = {
 
 type Actions = {
   // board actions
+  setActive: (idx: number) => void;
   addBoard: (board: Board) => void;
   editBoard: (name: string, columns: Column[]) => void;
   deleteBoard: () => void;
 
   // task actions
   addTask: (task: Task) => void;
-  editTask: (idx: number, newTask: Task) => void;
-  deleteTask: (idx: number) => void;
+  // editTask: (idx: number, newTask: Task) => void;
+  // deleteTask: (idx: number) => void;
 };
 
 const initialState = {
@@ -25,6 +26,14 @@ const initialState = {
 const useBoardStore = create(
   immer<State & Actions>((set) => ({
     ...initialState,
+
+    setActive: (idx) =>
+      set((state) => {
+        state.boards.forEach((board) => (board.isActive = false));
+        if (state.boards[idx]) {
+          state.boards[idx].isActive = true;
+        }
+      }),
 
     addBoard: (board) =>
       set((state) => {
@@ -56,9 +65,9 @@ const useBoardStore = create(
         }
       }),
 
-    editTask: (idx, newTask) => set((state) => {}),
+    // editTask: (idx, newTask) => set((state) => {}),
 
-    deleteTask: (idx) => set((state) => {}),
+    // deleteTask: (idx) => set((state) => {}),
   }))
 );
 

@@ -1,8 +1,8 @@
 import ShowIcon from "@icons/ShowIcon";
-import Fab from "@mui/material/Fab";
+import MuiFab from "@mui/material/Fab";
 import Zoom from "@mui/material/Zoom";
 
-export default function FabButton({
+export default function Fab({
   open,
   handleClick,
 }: {
@@ -11,7 +11,7 @@ export default function FabButton({
 }) {
   return (
     <Zoom in={!open}>
-      <Fab
+      <MuiFab
         sx={{
           position: "absolute",
           left: 0,
@@ -22,7 +22,7 @@ export default function FabButton({
         onClick={handleClick}
       >
         <ShowIcon />
-      </Fab>
+      </MuiFab>
     </Zoom>
   );
 }

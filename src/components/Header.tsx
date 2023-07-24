@@ -4,10 +4,10 @@ import Link from "@mui/material/Link";
 import LogoIcon from "@icons/LogoIcon";
 import Typography from "@mui/material/Typography";
 import styled from "@mui/material/styles/styled";
-import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
 import MoreIcon from "@icons/MoreIcon";
+import AddNewTaskButton from "./Buttons/AddNewTaskButton";
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -28,14 +28,6 @@ const AppBar = styled(MuiAppBar)<AppBarProps>(({ theme, open }) => ({
   }),
 }));
 
-const AddNewTaskButton = styled(Button)(({ theme }) => ({
-  borderRadius: "24px",
-  fontWeight: "bold",
-  textTransform: "none",
-  marginRight: theme.spacing(1),
-  paddingInline: theme.spacing(2),
-}));
-
 const LogoLink = styled(Link)(({ theme }) => ({
   paddingInline: theme.spacing(5),
 }));
@@ -48,12 +40,13 @@ function Logo() {
   );
 }
 
-export default function Header({ title }: { title: string }) {
+export default function Header({ name }: { name: string }) {
   return (
     <AppBar
       position="fixed"
       enableColorOnDark
       sx={{
+        zIndex: (t) => t.zIndex.drawer + 1,
         backgroundColor: (t) => t.palette.background.default,
       }}
     >
@@ -68,12 +61,10 @@ export default function Header({ title }: { title: string }) {
           noWrap
           color={(t) => t.palette.text.primary}
         >
-          {title}
+          {name}
         </Typography>
         <Box>
-          <AddNewTaskButton variant="contained">
-            + Add New Task
-          </AddNewTaskButton>
+          <AddNewTaskButton />
           <IconButton>
             <MoreIcon />
           </IconButton>
