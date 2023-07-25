@@ -8,6 +8,8 @@ import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
 import MoreIcon from "@icons/MoreIcon";
 import AddNewTaskButton from "./Buttons/AddNewTaskButton";
+import AddNewTaskModal from "./Modals/AddNewTaskDialog";
+import { useState } from "react";
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -40,7 +42,9 @@ function Logo() {
   );
 }
 
-export default function Header({ name }: { name: string }) {
+export default function Header({ board }: { board: Board }) {
+  const [open, setOpen] = useState(false);
+
   return (
     <AppBar
       position="fixed"
@@ -61,15 +65,20 @@ export default function Header({ name }: { name: string }) {
           noWrap
           color={(t) => t.palette.text.primary}
         >
-          {name}
+          {board.name}
         </Typography>
         <Box>
-          <AddNewTaskButton />
+          <AddNewTaskButton onClick={() => setOpen(true)} />
           <IconButton>
             <MoreIcon />
           </IconButton>
         </Box>
       </Toolbar>
+      <AddNewTaskModal
+        open={open}
+        board={board}
+        onClose={() => setOpen(false)}
+      />
     </AppBar>
   );
 }

@@ -18,8 +18,8 @@ export default function ColumnStack({ column }: { column: Column }) {
         {column.name} ({column.tasks.length})
       </Typography>
       <Stack spacing={2.5}>
-        {column.tasks.map((task) => (
-          <Item task={task} />
+        {column.tasks.map((task, idx) => (
+          <Item key={idx} task={task} />
         ))}
       </Stack>
     </Box>

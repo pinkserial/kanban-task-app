@@ -31,7 +31,7 @@ export default function Dashboard({ board }: { board: Board }) {
 
   return (
     <Box>
-      <Header name={board.name} />
+      <Header board={board} />
       <Sidebar open={open} handleClick={() => setOpen(false)} />
       <Container open={open}>
         <Toolbar />

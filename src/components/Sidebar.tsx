@@ -56,8 +56,8 @@ function BoardItem({ board }: { board: Board }) {
 function BoardList({ boards }: { boards: Board[] }) {
   return (
     <List sx={{ flex: 1 }}>
-      {boards.map((board) => (
-        <BoardItem board={board}></BoardItem>
+      {boards.map((board, idx) => (
+        <BoardItem key={idx} board={board}></BoardItem>
       ))}
       <ListItem>
         <ListItemButton>

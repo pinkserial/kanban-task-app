@@ -11,7 +11,7 @@ interface Column {
 
 interface Task {
   title: string;
-  description: string;
+  description?: string;
   status: string;
   subtasks: SubTask[];
 }

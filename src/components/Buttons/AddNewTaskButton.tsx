@@ -11,11 +11,20 @@ const Button = styled(MuiButton)(({ theme }) => ({
   paddingInline: theme.spacing(2),
 }));
 
-export default function AddNewTaskButton() {
+export default function AddNewTaskButton({ onClick }: { onClick: () => void }) {
   return (
-    <Button>
-      <PlusIcon />
-      <Typography>Add New Task</Typography>
+    <Button
+      variant="contained"
+      sx={{
+        gap: "5px",
+        paddingBlock: (t) => t.spacing(1),
+      }}
+      onClick={onClick}
+    >
+      <PlusIcon fontSize="small" />
+      <Typography fontWeight="bold" color="white" textTransform="capitalize">
+        add new task
+      </Typography>
     </Button>
   );
 }
