@@ -4,6 +4,7 @@ import data from "@assets/data.json";
 
 type State = {
   boards: Board[];
+  activeBoard: Board | null;
 };
 
 type Actions = {
@@ -15,12 +16,21 @@ type Actions = {
 
   // task actions
   addTask: (task: Task) => void;
-  // editTask: (idx: number, newTask: Task) => void;
+  editTask: (columnIdx: number, taskIdx: number, newTask: Task) => void;
   // deleteTask: (idx: number) => void;
+
+  changeSubTasks: (
+    columnIdx: number,
+    taskIdx: number,
+    subtasks: SubTask[]
+  ) => void;
+
+  changeColumn: (prevColIdx: number, colIdx: number, taskIdx: number) => void;
 };
 
 const initialState = {
   boards: data.boards,
+  activeBoard: null,
 };
 
 const useBoardStore = create(
@@ -65,9 +75,40 @@ const useBoardStore = create(
         }
       }),
 
-    // editTask: (idx, newTask) => set((state) => {}),
+    editTask: (columnIdx, taskIdx, newTask) =>
+      set((state) => {
+        const activeBoard = state.boards.find(
+          (board) => board.isActive
+        ) as Board;
+        const column = activeBoard.columns[columnIdx];
+        // todo
+      }),
 
     // deleteTask: (idx) => set((state) => {}),
+
+    changeSubTasks: (columnIdx, taskIdx, subtasks) =>
+      set((state) => {
+        const activeBoard = state.boards.find(
+          (board) => board.isActive
+        ) as Board;
+        const column = activeBoard.columns[columnIdx];
+        column.tasks[taskIdx].subtasks = subtasks;
+      }),
+
+    changeColumn: (prevColIdx, colIdx, taskIdx) =>
+      set((state) => {
+        const activeBoard = state.boards.find(
+          (board) => board.isActive
+        ) as Board;
+
+        const prevColumn = activeBoard.columns[prevColIdx];
+        const column = activeBoard.columns[colIdx];
+
+        const task = prevColumn.tasks[taskIdx];
+
+        column.tasks.push(task);
+        prevColumn.tasks.splice(taskIdx, 1);
+      }),
   }))
 );
 

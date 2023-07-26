@@ -38,7 +38,7 @@ export default function Dashboard({ board }: { board: Board }) {
         <Grid container spacing={2}>
           {board.columns.map((column, idx) => (
             <Grid key={idx} item xs>
-              <Column column={column} />
+              <Column colIdx={idx} column={column} />
             </Grid>
           ))}
         </Grid>
