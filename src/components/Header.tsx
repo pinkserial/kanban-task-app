@@ -8,7 +8,7 @@ import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
 import MoreIcon from "@icons/MoreIcon";
 import AddNewTaskButton from "./Buttons/AddNewTaskButton";
-import AddNewTaskModal from "./Modals/AddNewTaskDialog";
+import AddTask from "./Modals/AddTask";
 import { useState } from "react";
 
 interface AppBarProps extends MuiAppBarProps {
@@ -74,11 +74,7 @@ export default function Header({ board }: { board: Board }) {
           </IconButton>
         </Box>
       </Toolbar>
-      <AddNewTaskModal
-        open={open}
-        board={board}
-        onClose={() => setOpen(false)}
-      />
+      <AddTask open={open} board={board} onClose={() => setOpen(false)} />
     </AppBar>
   );
 }

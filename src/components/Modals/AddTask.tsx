@@ -6,12 +6,9 @@ import DialogContent from "@mui/material/DialogContent";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CloseIcon from "@icons/CloseIcon";
-import Divider from "@mui/material/Divider";
 import {
   DialogActions,
   FormControl,
-  FormGroup,
-  FormLabel,
   InputLabel,
   List,
   ListItem,

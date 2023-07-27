@@ -4,7 +4,6 @@ import data from "@assets/data.json";
 
 type State = {
   boards: Board[];
-  activeBoard: Board | null;
 };
 
 type Actions = {
@@ -17,7 +16,7 @@ type Actions = {
   // task actions
   addTask: (task: Task) => void;
   editTask: (columnIdx: number, taskIdx: number, newTask: Task) => void;
-  // deleteTask: (idx: number) => void;
+  deleteTask: (columnIdx: number, taskIdx: number) => void;
 
   changeSubTasks: (
     columnIdx: number,
@@ -30,7 +29,6 @@ type Actions = {
 
 const initialState = {
   boards: data.boards,
-  activeBoard: null,
 };
 
 const useBoardStore = create(
@@ -81,10 +79,18 @@ const useBoardStore = create(
           (board) => board.isActive
         ) as Board;
         const column = activeBoard.columns[columnIdx];
+        column.tasks[taskIdx] = newTask;
         // todo
       }),
 
-    // deleteTask: (idx) => set((state) => {}),
+    deleteTask: (colIdx, taskIdx) =>
+      set((state) => {
+        const activeBoard = state.boards.find(
+          (board) => board.isActive
+        ) as Board;
+        const column = activeBoard.columns[colIdx];
+        column.tasks = column.tasks.filter((_, i) => i !== taskIdx);
+      }),
 
     changeSubTasks: (columnIdx, taskIdx, subtasks) =>
       set((state) => {

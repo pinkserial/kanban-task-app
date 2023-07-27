@@ -10,34 +10,57 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
-  Divider,
   InputLabel,
   MenuItem,
   Select,
-  SelectChangeEvent,
   DialogActions,
   Button,
   Menu,
-  Box,
 } from "@mui/material";
 import MoreIcon from "@icons/MoreIcon";
 import { useState } from "react";
 import useBoardStore from "@hooks/useBoards";
+import EditTask from "./EditTask";
+import DeleteTask from "./DeleteTask";
 
 function MoreMenu({
+  colIdx,
+  taskIdx,
+  task,
   open,
   anchor,
   onClose,
 }: {
+  colIdx: number;
+  taskIdx: number;
+  task: Task;
   open: boolean;
   anchor: HTMLElement | null;
   onClose: () => void;
 }) {
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
+  const deleteTask = useBoardStore((state) => state.deleteTask);
+
   return (
-    <Menu open={open} anchorEl={anchor} onClose={onClose}>
-      <MenuItem>Edit Task</MenuItem>
-      <MenuItem>Delete Task</MenuItem>
-    </Menu>
+    <>
+      <Menu open={open} anchorEl={anchor} onClose={onClose}>
+        <MenuItem onClick={() => setEditOpen(true)}>Edit Task</MenuItem>
+        <MenuItem onClick={() => setDeleteOpen(true)}>Delete Task</MenuItem>
+      </Menu>
+      <EditTask
+        open={editOpen}
+        task={task}
+        onClose={() => setEditOpen(false)}
+      />
+      <DeleteTask
+        open={deleteOpen}
+        title={task.title}
+        handleClose={() => setDeleteOpen(false)}
+        handleDelete={() => deleteTask(colIdx, taskIdx)}
+      />
+    </>
   );
 }
 
@@ -85,11 +108,14 @@ export default function DetailTask({
           <MoreIcon />
         </IconButton>
         <MoreMenu
+          task={task}
           open={menuOpen}
           anchor={anchorEl}
           onClose={() => {
             setAnchorEl(null);
           }}
+          colIdx={colIdx}
+          taskIdx={taskIdx}
         />
       </DialogTitle>
       <DialogContent dividers>
@@ -100,7 +126,6 @@ export default function DetailTask({
             {subtasks.map((subtask, idx) => (
               <FormControlLabel
                 key={idx}
-                sx={{ margin: 0, marginBottom: 1, bgcolor: "lightblue" }}
                 control={
                   <Checkbox
                     checked={subtask.isCompleted}
