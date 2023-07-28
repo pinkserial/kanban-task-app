@@ -24,14 +24,15 @@ export default function EditTask({
   open,
   task,
   onClose,
+  onEdit,
 }: {
   open: boolean;
   task: Task;
   onClose: () => void;
+  onEdit: (t: Task) => void;
 }) {
   const boards = useBoardStore((state) => state.boards);
   const activeBoard = boards.find((board) => board.isActive) as Board;
-  const editTask = useBoardStore((state) => state.editTask);
 
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description);
@@ -77,7 +78,17 @@ export default function EditTask({
         <Button variant="contained" onClick={onClose}>
           Cancel
         </Button>
-        <Button type="submit" variant="contained">
+        <Button
+          variant="contained"
+          onClick={() => {
+            const subtasks = subtitles.map((t) => ({
+              title: t,
+              isCompleted: false,
+            }));
+            onEdit({ title, description, subtasks, status });
+            onClose();
+          }}
+        >
           Confirm
         </Button>
       </DialogActions>

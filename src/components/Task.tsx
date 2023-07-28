@@ -27,13 +27,13 @@ export default function Item({
         <Typography variant="subtitle1">{task.title}</Typography>
         <Typography variant="caption">{`${numOfCompleted} of ${task.subtasks.length} subtasks`}</Typography>
       </Paper>
-      <DetailTask
+      {/* <DetailTask
         open={open}
         onClose={() => setOpen(false)}
         task={task}
         colIdx={colIdx}
         taskIdx={taskIdx}
-      />
+      /> */}
     </Box>
   );
 }

@@ -37,7 +37,8 @@ const useBoardStore = create(
 
     setActive: (idx) =>
       set((state) => {
-        state.boards.forEach((board) => (board.isActive = false));
+        console.log("idx", idx);
+        // state.boards.forEach((board) => (board.isActive = false));
         if (state.boards[idx]) {
           state.boards[idx].isActive = true;
         }
@@ -80,7 +81,6 @@ const useBoardStore = create(
         ) as Board;
         const column = activeBoard.columns[columnIdx];
         column.tasks[taskIdx] = newTask;
-        // todo
       }),
 
     deleteTask: (colIdx, taskIdx) =>

@@ -22,6 +22,7 @@ import { useState } from "react";
 import useBoardStore from "@hooks/useBoards";
 import EditTask from "./EditTask";
 import DeleteTask from "./DeleteTask";
+import { shallow } from "zustand/shallow";
 
 function MoreMenu({
   colIdx,
@@ -29,6 +30,7 @@ function MoreMenu({
   task,
   open,
   anchor,
+  dialogClose,
   onClose,
 }: {
   colIdx: number;
@@ -36,12 +38,14 @@ function MoreMenu({
   task: Task;
   open: boolean;
   anchor: HTMLElement | null;
+  dialogClose: () => void;
   onClose: () => void;
 }) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const deleteTask = useBoardStore((state) => state.deleteTask);
+  const editTask = useBoardStore((state) => state.editTask);
 
   return (
     <>
@@ -53,12 +57,21 @@ function MoreMenu({
         open={editOpen}
         task={task}
         onClose={() => setEditOpen(false)}
+        onEdit={(v) => {
+          editTask(colIdx, taskIdx, v);
+          onClose();
+          dialogClose();
+        }}
       />
       <DeleteTask
         open={deleteOpen}
         title={task.title}
         handleClose={() => setDeleteOpen(false)}
-        handleDelete={() => deleteTask(colIdx, taskIdx)}
+        handleDelete={() => {
+          deleteTask(colIdx, taskIdx);
+          onClose();
+          dialogClose();
+        }}
       />
     </>
   );
@@ -77,11 +90,10 @@ export default function DetailTask({
   colIdx: number;
   taskIdx: number;
 }) {
-  const [boards, changeColumn, changeSubTasks] = useBoardStore((state) => [
-    state.boards,
-    state.changeColumn,
-    state.changeSubTasks,
-  ]);
+  const [boards, changeColumn, changeSubTasks] = useBoardStore(
+    (state) => [state.boards, state.changeColumn, state.changeSubTasks],
+    shallow
+  );
   const activeBoard = boards.find((board) => board.isActive) as Board;
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
@@ -114,6 +126,7 @@ export default function DetailTask({
           onClose={() => {
             setAnchorEl(null);
           }}
+          dialogClose={onClose}
           colIdx={colIdx}
           taskIdx={taskIdx}
         />
