@@ -29,12 +29,10 @@ const Container = styled("main")<{
 export default function Dashboard({ board }: { board: Board }) {
   const [open, setOpen] = useState(false);
 
-  console.log("DashBoard Component rendered!");
-
   return (
     <Box>
       <Header board={board} />
-      {/* <Sidebar open={open} handleClick={() => setOpen(false)} /> */}
+      <Sidebar open={open} handleClick={() => setOpen(false)} />
       <Container open={open}>
         <Toolbar />
         <Grid container spacing={2}>

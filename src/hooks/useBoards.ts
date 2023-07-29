@@ -8,23 +8,20 @@ type State = {
 
 type Actions = {
   // board actions
-  setActive: (idx: number) => void;
+  setActive: (boardId: number) => void;
   addBoard: (board: Board) => void;
-  editBoard: (name: string, columns: Column[]) => void;
+  editBoard: (board: Board) => void;
   deleteBoard: () => void;
 
+  // column actions
+  addColumn: (column: Column) => void;
+  editColumn: (columnId: number, column: Column) => void;
+
   // task actions
-  addTask: (task: Task) => void;
-  editTask: (columnIdx: number, taskIdx: number, newTask: Task) => void;
-  deleteTask: (columnIdx: number, taskIdx: number) => void;
-
-  changeSubTasks: (
-    columnIdx: number,
-    taskIdx: number,
-    subtasks: SubTask[]
-  ) => void;
-
-  changeColumn: (prevColIdx: number, colIdx: number, taskIdx: number) => void;
+  addTask: (columnId: number, task: Task) => void;
+  editTask: (columnId: number, taskId: number, task: Task) => void;
+  deleteTask: (columnId: number, taskId: number) => void;
+  moveStatus: (columnId: number, nextColumnId: number, taskId: number) => void;
 };
 
 const initialState = {
@@ -35,13 +32,14 @@ const useBoardStore = create(
   immer<State & Actions>((set) => ({
     ...initialState,
 
-    setActive: (idx) =>
+    setActive: (id) =>
       set((state) => {
-        console.log("idx", idx);
-        // state.boards.forEach((board) => (board.isActive = false));
-        if (state.boards[idx]) {
-          state.boards[idx].isActive = true;
+        const boards = state.boards;
+        if (!boards[id]) {
+          return new Error("No board");
         }
+        boards.forEach((b) => (b.isActive = false));
+        boards[id].isActive = true;
       }),
 
     addBoard: (board) =>
@@ -49,13 +47,18 @@ const useBoardStore = create(
         state.boards.push(board);
       }),
 
-    editBoard: (name, columns) =>
+    editBoard: (board) =>
       set((state) => {
         const activeBoard = state.boards.find((board) => board.isActive);
-        if (activeBoard) {
-          activeBoard.name = name;
-          activeBoard.columns = columns;
+
+        if (!activeBoard) {
+          return new Error("No Active Board");
         }
+
+        const { name, columns } = board;
+
+        activeBoard.name = name;
+        activeBoard.columns = columns;
       }),
 
     deleteBoard: () =>
@@ -63,53 +66,104 @@ const useBoardStore = create(
         state.boards = state.boards.filter((board) => !board.isActive);
       }),
 
-    addTask: (task) =>
+    addColumn: (column) =>
       set((state) => {
         const activeBoard = state.boards.find((board) => board.isActive);
-        const column = activeBoard?.columns.find(
-          (column) => column.name === task.status
-        );
-        if (column) {
-          column.tasks.push(task);
+
+        if (!activeBoard) {
+          return new Error("No Active Board");
         }
+
+        activeBoard.columns.push(column);
       }),
 
-    editTask: (columnIdx, taskIdx, newTask) =>
+    editColumn: (columnId, column) =>
       set((state) => {
-        const activeBoard = state.boards.find(
-          (board) => board.isActive
-        ) as Board;
-        const column = activeBoard.columns[columnIdx];
-        column.tasks[taskIdx] = newTask;
+        const activeBoard = state.boards.find((board) => board.isActive);
+
+        if (!activeBoard) {
+          return new Error("No Active Board");
+        }
+
+        const currentColumn = activeBoard.columns[columnId];
+
+        const { name, tasks } = column;
+
+        currentColumn.name = name;
+        currentColumn.tasks = tasks;
       }),
 
-    deleteTask: (colIdx, taskIdx) =>
+    addTask: (columnId, task) =>
       set((state) => {
-        const activeBoard = state.boards.find(
-          (board) => board.isActive
-        ) as Board;
-        const column = activeBoard.columns[colIdx];
-        column.tasks = column.tasks.filter((_, i) => i !== taskIdx);
+        const activeBoard = state.boards.find((board) => board.isActive);
+
+        if (!activeBoard) {
+          return new Error("No Active Board");
+        }
+
+        const column = activeBoard.columns[columnId];
+        column.tasks.push(task);
       }),
 
-    changeSubTasks: (columnIdx, taskIdx, subtasks) =>
+    editTask: (columnId, taskId, task) =>
       set((state) => {
-        const activeBoard = state.boards.find(
-          (board) => board.isActive
-        ) as Board;
-        const column = activeBoard.columns[columnIdx];
-        column.tasks[taskIdx].subtasks = subtasks;
+        const activeBoard = state.boards.find((board) => board.isActive);
+
+        if (!activeBoard) {
+          return new Error("No Active Board");
+        }
+
+        const column = activeBoard.columns[columnId];
+        const currentTask = column.tasks[taskId];
+
+        const { title, status, subtasks, description } = task;
+
+        if (status !== currentTask.status) {
+          currentTask.status = status;
+
+          // delete the task from current column.
+          column.tasks.splice(taskId, 1);
+
+          // push the task to next column.
+          const nextColumn = activeBoard.columns.find(
+            (column) => column.name === status
+          );
+
+          if (!nextColumn) {
+            return new Error("no column");
+          }
+
+          nextColumn.tasks.push(task);
+          return;
+        }
+
+        currentTask.title = title;
+        currentTask.description = description;
+        currentTask.subtasks = subtasks;
       }),
 
-    changeColumn: (prevColIdx, colIdx, taskIdx) =>
+    deleteTask: (columnId, taskId) =>
       set((state) => {
-        const activeBoard = state.boards.find(
-          (board) => board.isActive
-        ) as Board;
+        const activeBoard = state.boards.find((board) => board.isActive);
+
+        if (!activeBoard) {
+          return new Error("No Active Board");
+        }
+
+        const column = activeBoard.columns[columnId];
+        column.tasks = column.tasks.filter((_, i) => i !== taskId);
+      }),
+
+    moveStatus: (prevColIdx, colIdx, taskIdx) =>
+      set((state) => {
+        const activeBoard = state.boards.find((board) => board.isActive);
+
+        if (!activeBoard) {
+          return new Error("No Active Board");
+        }
 
         const prevColumn = activeBoard.columns[prevColIdx];
         const column = activeBoard.columns[colIdx];
-
         const task = prevColumn.tasks[taskIdx];
 
         column.tasks.push(task);

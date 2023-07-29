@@ -8,11 +8,13 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import BoardIcon from "@icons/BoardIcon";
+import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import ThemeToggle from "@components/ThemeToggle";
 import useBoardStore from "@hooks/useBoards";
+import AddBoard from "./Modals/AddBoard";
+import Divider from "@mui/material/Divider";
 
 interface DrawerProps extends MuiDrawerProps {
   open: boolean;
@@ -38,12 +40,26 @@ const BoardListHeader = styled(Typography)(({ theme }) => ({
   textAlign: "center",
 }));
 
-function BoardItem({ board }: { board: Board }) {
+function BoardItem({ id, board }: { id: number; board: Board }) {
+  const setActive = useBoardStore((state) => state.setActive);
+
   return (
     <ListItem>
-      <ListItemButton>
+      <ListItemButton
+        sx={{
+          borderTopRightRadius: "20px",
+          borderBottomRightRadius: "20px",
+          "&.Mui-selected": {
+            backgroundColor: "primary.main",
+          },
+        }}
+        selected={board.isActive}
+        onClick={() => {
+          setActive(id);
+        }}
+      >
         <ListItemIcon>
-          <BoardIcon />
+          <SpaceDashboardIcon />
         </ListItemIcon>
         <ListItemText
           primary={<Typography fontWeight="bold">{board.name}</Typography>}
@@ -57,22 +73,10 @@ function BoardList({ boards }: { boards: Board[] }) {
   return (
     <List sx={{ flex: 1 }}>
       {boards.map((board, idx) => (
-        <BoardItem key={idx} board={board}></BoardItem>
+        <BoardItem key={idx} id={idx} board={board}></BoardItem>
       ))}
-      <ListItem>
-        <ListItemButton>
-          <ListItemIcon>
-            <BoardIcon />
-          </ListItemIcon>
-          <ListItemText
-            primary={
-              <Typography fontWeight="bold" noWrap>
-                + Create New Board
-              </Typography>
-            }
-          />
-        </ListItemButton>
-      </ListItem>
+      <Divider />
+      <AddBoard />
     </List>
   );
 }

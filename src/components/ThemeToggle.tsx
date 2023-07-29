@@ -11,7 +11,6 @@ const ToggleBox = styled(Box)({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-around",
-  backgroundColor: "lightgreen",
   borderRadius: "5px",
 });
 

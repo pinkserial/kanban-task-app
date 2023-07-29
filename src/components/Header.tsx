@@ -3,7 +3,6 @@ import Toolbar from "@mui/material/Toolbar";
 import Link from "@mui/material/Link";
 import LogoIcon from "@icons/LogoIcon";
 import Typography from "@mui/material/Typography";
-import styled from "@mui/material/styles/styled";
 import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
 import Menu from "@mui/material/Menu";
@@ -19,15 +18,11 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteBoard from "./Modals/DeleteBoard";
 import useBoardStore from "@hooks/useBoards";
 
-const LogoLink = styled(Link)(({ theme }) => ({
-  padding: theme.spacing(1),
-}));
-
 function Logo() {
   return (
-    <LogoLink href="/">
+    <Link sx={{ padding: (t) => t.spacing(1) }} href="/">
       <LogoIcon />
-    </LogoLink>
+    </Link>
   );
 }
 
@@ -35,9 +30,7 @@ export default function Header({ board }: { board: Board }) {
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
-
   const [deleteBoardOpen, setDeleteBoardOpen] = useState(false);
-
   const deleteBoard = useBoardStore((state) => state.deleteBoard);
 
   return (
