@@ -1,167 +1,70 @@
 import DialogContent from "@mui/material/DialogContent";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
-import {
-  IconButton,
-  DialogContentText,
-  Typography,
-  FormControl,
-  FormLabel,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
-  InputLabel,
-  MenuItem,
-  Select,
-  DialogActions,
-  Button,
-  Menu,
-} from "@mui/material";
-import MoreIcon from "@icons/MoreIcon";
+
 import { useState } from "react";
-import useBoardStore from "@hooks/useBoards";
+import useBoardsStore from "@hooks/useBoards";
 import EditTask from "./EditTask";
 import DeleteTask from "./DeleteTask";
-import { shallow } from "zustand/shallow";
+import useBoard from "@hooks/useBoard";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import SaveIcon from "@mui/icons-material/Save";
+import DialogContentText from "@mui/material/DialogContentText";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import FormLabel from "@mui/material/FormLabel";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import { produce } from "immer";
+import CancelButton from "@components/Buttons/Cancel";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
 
-function MoreMenu({
-  colIdx,
-  taskIdx,
-  task,
-  open,
-  anchor,
-  dialogClose,
-  onClose,
-}: {
-  colIdx: number;
-  taskIdx: number;
-  task: Task;
+interface Props {
   open: boolean;
-  anchor: HTMLElement | null;
-  dialogClose: () => void;
-  onClose: () => void;
-}) {
-  const [editOpen, setEditOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
-
-  const deleteTask = useBoardStore((state) => state.deleteTask);
-  const editTask = useBoardStore((state) => state.editTask);
-
-  return (
-    <>
-      <Menu open={open} anchorEl={anchor} onClose={onClose}>
-        <MenuItem onClick={() => setEditOpen(true)}>Edit Task</MenuItem>
-        <MenuItem onClick={() => setDeleteOpen(true)}>Delete Task</MenuItem>
-      </Menu>
-      <EditTask
-        open={editOpen}
-        task={task}
-        onClose={() => setEditOpen(false)}
-        onEdit={(v) => {
-          editTask(colIdx, taskIdx, v);
-          onClose();
-          dialogClose();
-        }}
-      />
-      <DeleteTask
-        open={deleteOpen}
-        title={task.title}
-        handleClose={() => setDeleteOpen(false)}
-        handleDelete={() => {
-          deleteTask(colIdx, taskIdx);
-          onClose();
-          dialogClose();
-        }}
-      />
-    </>
-  );
+  close: () => void;
+  task: Task;
 }
 
-export default function DetailTask({
-  open,
-  task,
-  onClose,
-  colIdx,
-  taskIdx,
-}: {
-  open: boolean;
-  onClose: () => void;
-  task: Task;
-  colIdx: number;
-  taskIdx: number;
-}) {
-  const [boards, changeColumn, changeSubTasks] = useBoardStore(
-    (state) => [state.boards, state.changeColumn, state.changeSubTasks],
-    shallow
-  );
-  const activeBoard = boards.find((board) => board.isActive) as Board;
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const menuOpen = Boolean(anchorEl);
-  const [subtasks, setSubtasks] = useState([...task.subtasks]);
+export default function DetailTask({ open, close, task }: Props) {
+  const board = useBoard() as Board;
+  const [subtasks, setSubtasks] = useState(task.subtasks);
   const [status, setStatus] = useState(task.status);
 
-  const handleClick = () => {
-    const nextColIdx = activeBoard.columns.findIndex(
-      (column) => column.name === status
-    );
-
-    changeSubTasks(colIdx, taskIdx, subtasks);
-    changeColumn(colIdx, nextColIdx, taskIdx);
-    onClose();
-  };
-
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={close}>
       <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        <Typography sx={{ flex: 1, fontSize: (t) => t.typography.h5 }}>
+        <Typography sx={{ flex: 1, fontSize: "1.5rem" }}>
           {task.title}
         </Typography>
-        <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
-          <MoreIcon />
-        </IconButton>
-        <MoreMenu
-          task={task}
-          open={menuOpen}
-          anchor={anchorEl}
-          onClose={() => {
-            setAnchorEl(null);
-          }}
-          dialogClose={onClose}
-          colIdx={colIdx}
-          taskIdx={taskIdx}
-        />
+        <MoreMenu task={task} close={close} />
       </DialogTitle>
       <DialogContent dividers>
         <DialogContentText>{task.description}</DialogContentText>
-        <FormControl sx={{ my: 2, width: "100%" }}>
+        <FormControl sx={{ my: 2, width: "100%" }} component="fieldset">
           <FormLabel>Subtasks</FormLabel>
           <FormGroup>
-            {subtasks.map((subtask, idx) => (
-              <FormControlLabel
-                key={idx}
-                control={
-                  <Checkbox
-                    checked={subtask.isCompleted}
-                    onChange={(e) => {
-                      setSubtasks(
-                        subtasks.map((subtask, i) =>
-                          i === idx
-                            ? {
-                                title: subtask.title,
-                                isCompleted: e.target.checked,
-                              }
-                            : subtask
-                        )
-                      );
-                    }}
-                  />
-                }
-                label={subtask.title}
+            {task.subtasks.map((subtask, idx) => (
+              <SubTaskCheckbox
+                subtask={subtask}
+                onChange={(v) => {
+                  setSubtasks(
+                    produce((draft) => {
+                      draft[idx].isCompleted = v;
+                    })
+                  );
+                }}
               />
             ))}
           </FormGroup>
         </FormControl>
-        {activeBoard.columns.length > 0 && (
+        {board.columns.length > 0 && (
           <FormControl fullWidth margin="dense">
             <InputLabel>Current Status</InputLabel>
             <Select
@@ -170,7 +73,7 @@ export default function DetailTask({
               onChange={(e) => setStatus(e.target.value)}
               name="status"
             >
-              {activeBoard.columns.map((column, idx) => (
+              {board.columns.map((column, idx) => (
                 <MenuItem key={idx} value={column.name}>
                   {column.name}
                 </MenuItem>
@@ -180,13 +83,62 @@ export default function DetailTask({
         )}
       </DialogContent>
       <DialogActions>
-        <Button variant="contained" onClick={onClose}>
-          cancel
-        </Button>
-        <Button variant="contained" onClick={handleClick}>
-          save change
-        </Button>
+        <CancelButton close={close} />
+        <SaveButton
+          onChange={() => {
+            close();
+          }}
+        />
       </DialogActions>
     </Dialog>
+  );
+}
+
+function MoreMenu({ task, close }: { task: Task; close: () => void }) {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const menuOpen = Boolean(anchorEl);
+
+  return (
+    <>
+      <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
+        <MoreVertIcon />
+      </IconButton>
+      <Menu
+        open={menuOpen}
+        anchorEl={anchorEl}
+        onClose={() => setAnchorEl(null)}
+      >
+        <MenuItem>
+          <EditTask task={task} close={close} />
+        </MenuItem>
+        <MenuItem>
+          <DeleteTask task={task} />
+        </MenuItem>
+      </Menu>
+    </>
+  );
+}
+
+function SubTaskCheckbox({
+  subtask,
+  onChange,
+}: {
+  subtask: SubTask;
+  onChange: (v: boolean) => void;
+}) {
+  const checkbox = (
+    <Checkbox
+      checked={subtask.isCompleted}
+      onChange={(e) => onChange(e.target.checked)}
+    />
+  );
+  return <FormControlLabel label={subtask.title} control={checkbox} />;
+}
+
+function SaveButton({ onChange }: { onChange: () => void }) {
+  return (
+    <Button variant="contained" startIcon={<SaveIcon />} onClick={onChange}>
+      Save Change
+    </Button>
   );
 }

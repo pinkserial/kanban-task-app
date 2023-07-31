@@ -1,15 +1,15 @@
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import useTheme from "@hooks/useTheme";
-import useBoardStore from "@hooks/useBoards";
 import Dashboard from "@components/Dashboard";
-import NoBoard from "@components/NoBoard";
+import useBoardsStore from "@hooks/useBoards";
 import { useEffect } from "react";
+import BoardContext from "@contexts/board";
 
 function App() {
   const { theme } = useTheme();
-  const boards = useBoardStore((state) => state.boards);
-  const setActive = useBoardStore((state) => state.setActive);
+  const boards = useBoardsStore((state) => state.boards);
+  const setActive = useBoardsStore((state) => state.setActive);
   const activeboard = boards.find((board) => board.isActive);
 
   useEffect(() => {
@@ -18,10 +18,18 @@ function App() {
     }
   }, [activeboard, boards.length, setActive]);
 
+  useEffect(() => {
+    if (activeboard) {
+      document.title = activeboard.name;
+    }
+  }, [activeboard]);
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      {activeboard ? <Dashboard board={activeboard} /> : <NoBoard />}
+      <BoardContext.Provider value={activeboard}>
+        <Dashboard />
+      </BoardContext.Provider>
     </ThemeProvider>
   );
 }

@@ -83,10 +83,10 @@ function BoardList({ boards }: { boards: Board[] }) {
 
 export default function Sidebar({
   open,
-  handleClick,
+  onClose,
 }: {
   open: boolean;
-  handleClick: () => void;
+  onClose: () => void;
 }) {
   const boards = useBoardStore((state) => state.boards);
 
@@ -111,7 +111,7 @@ export default function Sidebar({
           alignItems: "center",
         }}
       >
-        <Button variant="text" startIcon={<HideIcon />} onClick={handleClick}>
+        <Button variant="text" startIcon={<HideIcon />} onClick={onClose}>
           <Typography fontWeight="bold">Hide Sidebar</Typography>
         </Button>
       </Box>

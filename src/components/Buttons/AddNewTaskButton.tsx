@@ -1,7 +1,6 @@
 import Typography from "@mui/material/Typography";
 import MuiButton from "@mui/material/Button";
 import styled from "@mui/material/styles/styled";
-import PlusIcon from "@icons/PlusIcon";
 
 const Button = styled(MuiButton)(({ theme }) => ({
   borderRadius: "24px",
@@ -21,7 +20,6 @@ export default function AddNewTaskButton({ onClick }: { onClick: () => void }) {
       }}
       onClick={onClick}
     >
-      <PlusIcon fontSize="small" />
       <Typography fontWeight="bold" color="white" textTransform="capitalize">
         add new task
       </Typography>

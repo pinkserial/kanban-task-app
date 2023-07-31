@@ -1,14 +1,16 @@
+import { useState } from "react";
 import Grid from "@mui/material/Grid";
 import Toolbar from "@mui/material/Toolbar";
 import styled from "@mui/material/styles/styled";
 import Header from "@components/Header";
 import Sidebar from "@components/Sidebar";
 import Column from "@components/Column";
-import { useState } from "react";
 import Box from "@mui/material/Box";
 import Fab from "./Buttons/Fab";
+import NoBoard from "./NoBoard";
+import useBoard from "@hooks/useBoard";
 
-const Container = styled("main")<{
+const Contents = styled("main")<{
   open: boolean;
 }>(({ theme, open }) => ({
   flexGrow: 1,
@@ -26,24 +28,29 @@ const Container = styled("main")<{
   }),
 }));
 
-export default function Dashboard({ board }: { board: Board }) {
-  const [open, setOpen] = useState(false);
+export default function Dashboard() {
+  const board = useBoard();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  if (!board) {
+    return <NoBoard />;
+  }
 
   return (
     <Box>
-      <Header board={board} />
-      <Sidebar open={open} handleClick={() => setOpen(false)} />
-      <Container open={open}>
+      <Header />
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Contents open={sidebarOpen}>
         <Toolbar />
         <Grid container spacing={2}>
           {board.columns.map((column, idx) => (
             <Grid key={idx} item xs>
-              <Column colIdx={idx} column={column} />
+              <Column idx={idx} column={column} />
             </Grid>
           ))}
         </Grid>
-      </Container>
-      <Fab open={open} handleClick={() => setOpen(true)} />
+      </Contents>
+      <Fab open={sidebarOpen} onClick={() => setSidebarOpen(true)} />
     </Box>
   );
 }

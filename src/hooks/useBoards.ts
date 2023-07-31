@@ -28,7 +28,7 @@ const initialState = {
   boards: data.boards,
 };
 
-const useBoardStore = create(
+const useBoardsStore = create(
   immer<State & Actions>((set) => ({
     ...initialState,
 
@@ -172,4 +172,4 @@ const useBoardStore = create(
   }))
 );
 
-export default useBoardStore;
+export default useBoardsStore;

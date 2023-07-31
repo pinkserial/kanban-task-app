@@ -4,10 +4,10 @@ import Zoom from "@mui/material/Zoom";
 
 export default function Fab({
   open,
-  handleClick,
+  onClick,
 }: {
   open: boolean;
-  handleClick: () => void;
+  onClick: () => void;
 }) {
   return (
     <Zoom in={!open}>
@@ -19,7 +19,7 @@ export default function Fab({
           margin: (t) => t.spacing(2),
         }}
         color="primary"
-        onClick={handleClick}
+        onClick={onClick}
       >
         <ShowIcon />
       </MuiFab>

@@ -3,157 +3,59 @@ import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import CloseIcon from "@icons/CloseIcon";
 import {
   DialogActions,
-  FormControl,
-  InputLabel,
-  List,
-  ListItem,
+  IconButton,
   MenuItem,
+  Paper,
   Select,
-  SelectChangeEvent,
-  Typography,
+  Stack,
 } from "@mui/material";
 import { useState } from "react";
-import PlusIcon from "@icons/PlusIcon";
+import CloseIcon from "@mui/icons-material/Close";
+import AddIcon from "@mui/icons-material/Add";
+import { produce } from "immer";
+import useBoard from "@hooks/useBoard";
 
-function SubTasks() {
-  const [titles, setTitles] = useState(["", ""]);
+const initialTask = (status: string) => ({
+  title: "",
+  description: "",
+  subtasks: [
+    { title: "", isCompleted: false },
+    { title: "", isCompleted: false },
+  ],
+  status,
+});
 
-  return (
-    <Box sx={{ display: "flex", flexDirection: "column" }}>
-      <List>
-        {titles.map((title, idx) => (
-          <SubTask
-            key={idx}
-            value={title}
-            name={`subtask_${idx}`}
-            handleChange={(v) => {
-              setTitles(titles.map((t, i) => (i === idx ? v : t)));
-            }}
-            handleClose={() => {
-              setTitles(titles.filter((_, i) => idx !== i));
-            }}
-          />
-        ))}
-      </List>
-      <Button
-        sx={{ gap: 1, marginBottom: 3 }}
-        variant="contained"
-        onClick={() => {
-          setTitles([...titles, ""]);
-        }}
-      >
-        <PlusIcon />
-        <Typography variant="h6" textTransform="capitalize">
-          add new subtask
-        </Typography>
-      </Button>
-    </Box>
-  );
-}
-
-function SubTask({
-  value,
-  name,
-  handleClose,
-  handleChange,
-}: {
-  value: string;
-  name: string;
-  handleClose: () => void;
-  handleChange: (v: string) => void;
-}) {
-  return (
-    <ListItem disableGutters>
-      <TextField
-        value={value}
-        fullWidth
-        label="Subtask"
-        name={name}
-        onChange={(e) => handleChange(e.target.value)}
-      />
-      <Button onClick={handleClose}>
-        <CloseIcon />
-      </Button>
-    </ListItem>
-  );
-}
-
-function SelectStatus({
-  initStatus,
-  columns,
-}: {
-  initStatus: string;
-  columns: Column[];
-}) {
-  const [status, setStatus] = useState(initStatus);
-
-  const handleChange = (event: SelectChangeEvent) => {
-    setStatus(event.target.value);
-  };
-
-  return (
-    <FormControl fullWidth margin="dense">
-      <InputLabel>Current Status</InputLabel>
-      <Select
-        label="Current Status"
-        value={status}
-        onChange={handleChange}
-        name="status"
-      >
-        {columns.map((column, idx) => (
-          <MenuItem key={idx} value={column.name}>
-            {column.name}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
-  );
-}
-
-export default function AddNewTaskDialog({
-  open,
-  board,
-  onClose,
-}: {
-  open: boolean;
-  board: Board;
-  onClose: () => void;
-}) {
+export default function AddTask() {
+  const board = useBoard() as Board;
   const addTask = useBoardStore((state) => state.addTask);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const [task, setTask] = useState<Task>(() =>
+    initialTask(board.columns[0].name)
+  );
 
-    const formData = new FormData(e.currentTarget);
+  const [open, setOpen] = useState(false);
 
-    const { title, description, status, ...rest } = Object.fromEntries(
-      formData.entries()
+  const handleConfirm = () => {
+    const columnId = board.columns.findIndex(
+      (column) => column.name === task.status
     );
 
-    const subtasks: SubTask[] = [];
-
-    for (const title in rest) {
-      subtasks.push({ title, isCompleted: false });
+    if (columnId === -1) {
+      return new Error("no column");
     }
 
-    addTask({
-      title: title as string,
-      description: description as string,
-      status: status as string,
-      subtasks: subtasks,
-    });
-
-    onClose();
+    addTask(columnId, task);
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <Box component="form" onSubmit={handleSubmit}>
+    <>
+      <Button variant="contained" startIcon={<AddIcon />}>
+        Add New Task
+      </Button>
+      <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle align="center">Add New Task</DialogTitle>
         <DialogContent>
           <TextField
@@ -162,7 +64,14 @@ export default function AddNewTaskDialog({
             variant="outlined"
             margin="dense"
             label="Task Name"
-            name="title"
+            value={task.title}
+            onChange={(e) =>
+              setTask(
+                produce((draft) => {
+                  draft.title = e.target.value;
+                })
+              )
+            }
             placeholder="Take coffee break"
           />
           <TextField
@@ -171,26 +80,98 @@ export default function AddNewTaskDialog({
             margin="dense"
             label="Description"
             multiline
+            value={task.description}
+            onChange={(e) =>
+              setTask(
+                produce((draft) => {
+                  draft.description = e.target.value;
+                })
+              )
+            }
             name="description"
             rows={4}
           />
-          <SubTasks />
+          <Stack>
+            {task.subtasks.map((subtask, idx) => (
+              <Paper
+                key={idx}
+                sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                elevation={0}
+              >
+                <TextField
+                  size="small"
+                  value={subtask.title}
+                  fullWidth
+                  label="Subtask"
+                  onChange={(e) =>
+                    setTask(
+                      produce((draft) => {
+                        draft.subtasks[idx].title = e.target.value;
+                      })
+                    )
+                  }
+                />
+                <IconButton
+                  onClick={() => {
+                    setTask(
+                      produce((draft) => {
+                        draft.subtasks.splice(idx, 1);
+                      })
+                    );
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </Paper>
+            ))}
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() =>
+                setTask(
+                  produce((draft) => {
+                    draft.subtasks.push({ title: "", isCompleted: false });
+                  })
+                )
+              }
+            >
+              Add New Subtask
+            </Button>
+          </Stack>
           {board.columns.length > 0 && (
-            <SelectStatus
-              initStatus={board.columns[0].name}
-              columns={board.columns}
-            />
+            <Select
+              value={task.status}
+              onChange={(e) =>
+                setTask(
+                  produce((draft) => {
+                    draft.status = e.target.value;
+                  })
+                )
+              }
+            >
+              {board.columns.map((column, idx) => (
+                <MenuItem key={idx} value={column.name}>
+                  {column.name}
+                </MenuItem>
+              ))}
+            </Select>
           )}
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" onClick={onClose}>
+          <Button variant="contained" onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button type="submit" variant="contained">
+          <Button
+            variant="contained"
+            onClick={() => {
+              handleConfirm();
+              setOpen(false);
+            }}
+          >
             Confirm
           </Button>
         </DialogActions>
-      </Box>
-    </Dialog>
+      </Dialog>
+    </>
   );
 }

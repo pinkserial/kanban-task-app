@@ -27,6 +27,10 @@ export default defineConfig({
         find: "@hooks",
         replacement: fileURLToPath(new URL("./src/hooks", import.meta.url)),
       },
+      {
+        find: "@contexts",
+        replacement: fileURLToPath(new URL("./src/contexts", import.meta.url)),
+      },
     ],
   },
   plugins: [react(), svgr()],

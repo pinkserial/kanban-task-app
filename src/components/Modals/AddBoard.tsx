@@ -86,6 +86,7 @@ export default function AddBoard() {
           >
             {board.columns.map((column, idx) => (
               <Paper
+                key={idx}
                 sx={{
                   display: "flex",
                   alignItems: "center",

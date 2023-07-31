@@ -24,7 +24,8 @@
       "@assets/*": ["./src/assets/*"],
       "@icons/*": ["./src/components/icons/*"],
       "@components/*": ["./src/components/*"],
-      "@hooks/*": ["./src/hooks/*"]
+      "@hooks/*": ["./src/hooks/*"],
+      "@contexts/*": ["./src/contexts/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],
