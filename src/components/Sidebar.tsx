@@ -13,7 +13,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import ThemeToggle from "@components/ThemeToggle";
 import useBoardStore from "@hooks/useBoards";
-import AddBoard from "./Modals/AddBoard";
+import AddBoard from "./Modals/boards/AddBoard";
 import Divider from "@mui/material/Divider";
 
 interface DrawerProps extends MuiDrawerProps {

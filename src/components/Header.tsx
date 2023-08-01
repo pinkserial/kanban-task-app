@@ -17,8 +17,8 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 
 // Custom Components
-import AddTask from "@components/Modals/AddTask";
-import DeleteBoard from "@components/Modals/DeleteBoard";
+import AddTask from "@components/Modals/tasks/AddTask";
+import DeleteBoard from "@components/Modals/boards/DeleteBoard";
 
 // Icons
 import LogoIcon from "@icons/LogoIcon";

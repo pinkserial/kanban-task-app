@@ -29,11 +29,14 @@ import Button from "@mui/material/Button";
 interface Props {
   open: boolean;
   close: () => void;
+  colId: number;
+  id: number;
   task: Task;
 }
 
-export default function DetailTask({ open, close, task }: Props) {
+export default function DetailTask({ open, close, colId, id, task }: Props) {
   const board = useBoard() as Board;
+
   const [subtasks, setSubtasks] = useState(task.subtasks);
   const [status, setStatus] = useState(task.status);
 
@@ -43,14 +46,14 @@ export default function DetailTask({ open, close, task }: Props) {
         <Typography sx={{ flex: 1, fontSize: "1.5rem" }}>
           {task.title}
         </Typography>
-        <MoreMenu task={task} close={close} />
+        <MoreMenu task={task} close={close} colId={colId} id={id} />
       </DialogTitle>
       <DialogContent dividers>
         <DialogContentText>{task.description}</DialogContentText>
         <FormControl sx={{ my: 2, width: "100%" }} component="fieldset">
           <FormLabel>Subtasks</FormLabel>
           <FormGroup>
-            {task.subtasks.map((subtask, idx) => (
+            {subtasks.map((subtask, idx) => (
               <SubTaskCheckbox
                 subtask={subtask}
                 onChange={(v) => {
@@ -94,7 +97,17 @@ export default function DetailTask({ open, close, task }: Props) {
   );
 }
 
-function MoreMenu({ task, close }: { task: Task; close: () => void }) {
+function MoreMenu({
+  task,
+  close,
+  colId,
+  id,
+}: {
+  task: Task;
+  close: () => void;
+  colId: number;
+  id: number;
+}) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
 
@@ -109,10 +122,10 @@ function MoreMenu({ task, close }: { task: Task; close: () => void }) {
         onClose={() => setAnchorEl(null)}
       >
         <MenuItem>
-          <EditTask task={task} close={close} />
+          <EditTask task={task} close={close} colId={colId} id={id} />
         </MenuItem>
         <MenuItem>
-          <DeleteTask task={task} />
+          <DeleteTask title={task.title} colId={colId} id={id} close={close} />
         </MenuItem>
       </Menu>
     </>

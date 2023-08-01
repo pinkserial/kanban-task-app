@@ -6,21 +6,15 @@ const style: SxProps<Theme> = {
   letterSpacing: (t) => t.spacing(0.2),
 };
 
-export default function Column({
-  idx,
-  column,
-}: {
-  idx: number;
-  column: Column;
-}) {
+export default function Column({ id, column }: { id: number; column: Column }) {
   return (
     <Box sx={{ m: 1 }}>
       <Typography variant="subtitle1" sx={style} gutterBottom>
         {column.name} ({column.tasks.length})
       </Typography>
       <Stack spacing={2.5}>
-        {column.tasks.map((task) => (
-          <Task key={idx} task={task} />
+        {column.tasks.map((task, idx) => (
+          <Task key={idx} colId={id} id={idx} task={task} />
         ))}
       </Stack>
     </Box>

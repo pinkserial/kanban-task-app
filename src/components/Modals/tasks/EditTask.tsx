@@ -1,62 +1,51 @@
 import useBoardStore from "@hooks/useBoards";
-import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
+import { useState } from "react";
+import EditIcon from "@mui/icons-material/Edit";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
-import Button from "@mui/material/Button";
-import {
-  DialogActions,
-  IconButton,
-  MenuItem,
-  Paper,
-  Select,
-  Stack,
-} from "@mui/material";
-import { useState } from "react";
-import CloseIcon from "@mui/icons-material/Close";
-import AddIcon from "@mui/icons-material/Add";
-import { produce } from "immer";
+import TextField from "@mui/material/TextField";
 import useBoard from "@hooks/useBoard";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
+import { produce } from "immer";
+import Stack from "@mui/material/Stack";
+import Paper from "@mui/material/Paper";
+import IconButton from "@mui/material/IconButton";
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
+import CancelButton from "@components/Buttons/Cancel";
 
-const initialTask = (status: string) => ({
-  title: "",
-  description: "",
-  subtasks: [
-    { title: "", isCompleted: false },
-    { title: "", isCompleted: false },
-  ],
-  status,
-});
+interface Props {
+  task: Task;
+  close: () => void;
+  colId: number;
+  id: number;
+}
 
-export default function AddTask() {
+export default function EditTask({ task, close, colId, id }: Props) {
   const board = useBoard() as Board;
-  const addTask = useBoardStore((state) => state.addTask);
-
-  const [task, setTask] = useState<Task>(() =>
-    initialTask(board.columns[0].name)
-  );
-
   const [open, setOpen] = useState(false);
-
-  const handleConfirm = () => {
-    const columnId = board.columns.findIndex(
-      (column) => column.name === task.status
-    );
-
-    if (columnId === -1) {
-      return new Error("no column");
-    }
-
-    addTask(columnId, task);
-  };
+  const editTask = useBoardStore((state) => state.editTask);
+  const [editedTask, setEditedTask] = useState(task);
 
   return (
     <>
-      <Button variant="contained" startIcon={<AddIcon />}>
-        Add New Task
-      </Button>
+      <Box sx={{ display: "flex" }} onClick={() => setOpen(true)}>
+        <ListItemIcon>
+          <EditIcon />
+        </ListItemIcon>
+        <ListItemText>Edit Task</ListItemText>
+      </Box>
       <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle align="center">Add New Task</DialogTitle>
+        <DialogTitle>Edit Task</DialogTitle>
         <DialogContent>
           <TextField
             required
@@ -64,9 +53,9 @@ export default function AddTask() {
             variant="outlined"
             margin="dense"
             label="Task Name"
-            value={task.title}
+            value={editedTask.title}
             onChange={(e) =>
-              setTask(
+              setEditedTask(
                 produce((draft) => {
                   draft.title = e.target.value;
                 })
@@ -80,19 +69,18 @@ export default function AddTask() {
             margin="dense"
             label="Description"
             multiline
-            value={task.description}
+            value={editedTask.description}
             onChange={(e) =>
-              setTask(
+              setEditedTask(
                 produce((draft) => {
                   draft.description = e.target.value;
                 })
               )
             }
-            name="description"
             rows={4}
           />
           <Stack>
-            {task.subtasks.map((subtask, idx) => (
+            {editedTask.subtasks.map((subtask, idx) => (
               <Paper
                 key={idx}
                 sx={{ display: "flex", alignItems: "center", gap: 1 }}
@@ -104,16 +92,17 @@ export default function AddTask() {
                   fullWidth
                   label="Subtask"
                   onChange={(e) =>
-                    setTask(
+                    setEditedTask(
                       produce((draft) => {
                         draft.subtasks[idx].title = e.target.value;
+                        draft.subtasks[idx].isCompleted = false;
                       })
                     )
                   }
                 />
                 <IconButton
                   onClick={() => {
-                    setTask(
+                    setEditedTask(
                       produce((draft) => {
                         draft.subtasks.splice(idx, 1);
                       })
@@ -128,7 +117,7 @@ export default function AddTask() {
               variant="contained"
               startIcon={<AddIcon />}
               onClick={() =>
-                setTask(
+                setEditedTask(
                   produce((draft) => {
                     draft.subtasks.push({ title: "", isCompleted: false });
                   })
@@ -139,33 +128,35 @@ export default function AddTask() {
             </Button>
           </Stack>
           {board.columns.length > 0 && (
-            <Select
-              value={task.status}
-              onChange={(e) =>
-                setTask(
-                  produce((draft) => {
-                    draft.status = e.target.value;
-                  })
-                )
-              }
-            >
-              {board.columns.map((column, idx) => (
-                <MenuItem key={idx} value={column.name}>
-                  {column.name}
-                </MenuItem>
-              ))}
-            </Select>
+            <FormControl fullWidth margin="dense">
+              <InputLabel>Current Status</InputLabel>
+              <Select
+                label="Current Status"
+                value={editedTask.status}
+                onChange={(e) => {
+                  setEditedTask(
+                    produce((draft) => {
+                      draft.status = e.target.value;
+                    })
+                  );
+                }}
+              >
+                {board.columns.map((column, idx) => (
+                  <MenuItem key={idx} value={column.name}>
+                    {column.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           )}
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
+          <CancelButton close={() => setOpen(false)} />
           <Button
             variant="contained"
             onClick={() => {
-              handleConfirm();
-              setOpen(false);
+              editTask(colId, id, editedTask);
+              close();
             }}
           >
             Confirm
