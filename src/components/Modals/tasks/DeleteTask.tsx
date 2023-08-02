@@ -14,13 +14,13 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
 
 interface Props {
-  colId: number;
-  id: number;
+  colIndex: number;
+  index: number;
   title: string;
   close: () => void;
 }
 
-export default function DeleteTask({ colId, id, title, close }: Props) {
+export default function DeleteTask({ colIndex, index, title, close }: Props) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -42,8 +42,8 @@ export default function DeleteTask({ colId, id, title, close }: Props) {
         <DialogActions>
           <CancelButton close={() => setOpen(false)} />
           <DeleteButton
-            colId={colId}
-            id={id}
+            colIndex={colIndex}
+            index={index}
             close={() => {
               setOpen(false);
               close();
@@ -64,18 +64,18 @@ function CancelButton({ close }: { close: () => void }) {
 }
 
 function DeleteButton({
-  colId,
-  id,
+  colIndex,
+  index,
   close,
 }: {
-  colId: number;
-  id: number;
+  colIndex: number;
+  index: number;
   close: () => void;
 }) {
   const deleteTask = useBoardsStore((state) => state.deleteTask);
 
   const handleClick = () => {
-    deleteTask(colId, id);
+    deleteTask(colIndex, index);
     close();
   };
 

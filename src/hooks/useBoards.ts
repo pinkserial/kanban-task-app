@@ -21,7 +21,15 @@ type Actions = {
   addTask: (columnId: number, task: Task) => void;
   editTask: (columnId: number, taskId: number, task: Task) => void;
   deleteTask: (columnId: number, taskId: number) => void;
-  moveStatus: (columnId: number, nextColumnId: number, taskId: number) => void;
+
+  // dnd actions
+  reorder: (columnIndex: number, startIndex: number, endIndex: number) => void;
+  move: (
+    srcColumnIndex: number,
+    destColumnIndex: number,
+    srcTaskIndex: number,
+    destTaskIndex: number
+  ) => void;
 };
 
 const initialState = {
@@ -154,20 +162,33 @@ const useBoardsStore = create(
         column.tasks = column.tasks.filter((_, i) => i !== taskId);
       }),
 
-    moveStatus: (prevColIdx, colIdx, taskIdx) =>
+    reorder: (columnIndex, startIndex, endIndex) =>
       set((state) => {
-        const activeBoard = state.boards.find((board) => board.isActive);
+        const board = state.boards.find((board) => board.isActive);
 
-        if (!activeBoard) {
+        if (!board) {
           return new Error("No Active Board");
         }
 
-        const prevColumn = activeBoard.columns[prevColIdx];
-        const column = activeBoard.columns[colIdx];
-        const task = prevColumn.tasks[taskIdx];
+        const column = board.columns[columnIndex];
 
-        column.tasks.push(task);
-        prevColumn.tasks.splice(taskIdx, 1);
+        const [removed] = column.tasks.splice(startIndex, 1);
+        column.tasks.splice(endIndex, 0, removed);
+      }),
+
+    move: (srcColumnIndex, destColumnIndex, srcTaskIndex, destTaskIndex) =>
+      set((state) => {
+        const board = state.boards.find((board) => board.isActive);
+
+        if (!board) {
+          return new Error("No Active Board");
+        }
+
+        const srcColumn = board.columns[srcColumnIndex];
+        const destColumn = board.columns[destColumnIndex];
+
+        const [removed] = srcColumn.tasks.splice(srcTaskIndex, 1);
+        destColumn.tasks.splice(destTaskIndex, 0, removed);
       }),
   }))
 );

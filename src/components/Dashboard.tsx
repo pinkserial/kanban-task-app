@@ -9,6 +9,12 @@ import Box from "@mui/material/Box";
 import Fab from "./Buttons/Fab";
 import NoBoard from "./NoBoard";
 import useBoard from "@hooks/useBoard";
+import { DragDropContext, DropResult } from "@hello-pangea/dnd";
+import useBoardsStore from "@hooks/useBoards";
+import Paper from "@mui/material/Paper";
+import Button from "@mui/material/Button";
+import { Typography } from "@mui/material";
+import NewColumn from "./NewColumn";
 
 const Contents = styled("main")<{
   open: boolean;
@@ -31,24 +37,51 @@ const Contents = styled("main")<{
 export default function Dashboard() {
   const board = useBoard();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const reorder = useBoardsStore((state) => state.reorder);
+  const move = useBoardsStore((state) => state.move);
+
+  const onDragEnd = (result: DropResult) => {
+    const { source, destination } = result;
+
+    if (!destination) {
+      return;
+    }
+
+    const srcColIndex = +source.droppableId;
+    const destColIndex = +destination.droppableId;
+
+    if (srcColIndex === destColIndex) {
+      reorder(srcColIndex, source.index, destination.index);
+    } else {
+      move(srcColIndex, destColIndex, source.index, destination.index);
+    }
+  };
 
   if (!board) {
     return <NoBoard />;
   }
 
   return (
-    <Box>
+    <Box sx={{ height: "100vh" }}>
       <Header />
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <Contents open={sidebarOpen}>
+      <Contents
+        open={sidebarOpen}
+        sx={{ display: "flex", flexDirection: "column", height: "100%" }}
+      >
         <Toolbar />
-        <Grid container spacing={2}>
-          {board.columns.map((column, idx) => (
-            <Grid key={idx} item xs>
-              <Column id={idx} column={column} />
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Grid container spacing={2} sx={{ flex: 1 }}>
+            {board.columns.map((column, index) => (
+              <Grid key={index} item xs>
+                <Column index={index} column={column} />
+              </Grid>
+            ))}
+            <Grid item xs>
+              <NewColumn />
             </Grid>
-          ))}
-        </Grid>
+          </Grid>
+        </DragDropContext>
       </Contents>
       <Fab open={sidebarOpen} onClick={() => setSidebarOpen(true)} />
     </Box>

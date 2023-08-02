@@ -3,7 +3,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 
 import { useState } from "react";
-import useBoardsStore from "@hooks/useBoards";
+
 import EditTask from "./EditTask";
 import DeleteTask from "./DeleteTask";
 import useBoard from "@hooks/useBoard";
@@ -29,12 +29,18 @@ import Button from "@mui/material/Button";
 interface Props {
   open: boolean;
   close: () => void;
-  colId: number;
-  id: number;
+  colIndex: number;
+  index: number;
   task: Task;
 }
 
-export default function DetailTask({ open, close, colId, id, task }: Props) {
+export default function DetailTask({
+  open,
+  close,
+  colIndex,
+  index,
+  task,
+}: Props) {
   const board = useBoard() as Board;
 
   const [subtasks, setSubtasks] = useState(task.subtasks);
@@ -46,7 +52,7 @@ export default function DetailTask({ open, close, colId, id, task }: Props) {
         <Typography sx={{ flex: 1, fontSize: "1.5rem" }}>
           {task.title}
         </Typography>
-        <MoreMenu task={task} close={close} colId={colId} id={id} />
+        <MoreMenu task={task} close={close} colIndex={colIndex} index={index} />
       </DialogTitle>
       <DialogContent dividers>
         <DialogContentText>{task.description}</DialogContentText>
@@ -55,6 +61,7 @@ export default function DetailTask({ open, close, colId, id, task }: Props) {
           <FormGroup>
             {subtasks.map((subtask, idx) => (
               <SubTaskCheckbox
+                key={idx}
                 subtask={subtask}
                 onChange={(v) => {
                   setSubtasks(
@@ -100,13 +107,13 @@ export default function DetailTask({ open, close, colId, id, task }: Props) {
 function MoreMenu({
   task,
   close,
-  colId,
-  id,
+  colIndex,
+  index,
 }: {
   task: Task;
   close: () => void;
-  colId: number;
-  id: number;
+  colIndex: number;
+  index: number;
 }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
@@ -122,10 +129,20 @@ function MoreMenu({
         onClose={() => setAnchorEl(null)}
       >
         <MenuItem>
-          <EditTask task={task} close={close} colId={colId} id={id} />
+          <EditTask
+            task={task}
+            close={close}
+            colIndex={colIndex}
+            index={index}
+          />
         </MenuItem>
         <MenuItem>
-          <DeleteTask title={task.title} colId={colId} id={id} close={close} />
+          <DeleteTask
+            title={task.title}
+            colIndex={colIndex}
+            index={index}
+            close={close}
+          />
         </MenuItem>
       </Menu>
     </>

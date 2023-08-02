@@ -26,11 +26,11 @@ import CancelButton from "@components/Buttons/Cancel";
 interface Props {
   task: Task;
   close: () => void;
-  colId: number;
-  id: number;
+  colIndex: number;
+  index: number;
 }
 
-export default function EditTask({ task, close, colId, id }: Props) {
+export default function EditTask({ task, close, colIndex, index }: Props) {
   const board = useBoard() as Board;
   const [open, setOpen] = useState(false);
   const editTask = useBoardStore((state) => state.editTask);
@@ -155,7 +155,7 @@ export default function EditTask({ task, close, colId, id }: Props) {
           <Button
             variant="contained"
             onClick={() => {
-              editTask(colId, id, editedTask);
+              editTask(colIndex, index, editedTask);
               close();
             }}
           >

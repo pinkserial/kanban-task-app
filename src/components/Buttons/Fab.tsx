@@ -13,10 +13,10 @@ export default function Fab({
     <Zoom in={!open}>
       <MuiFab
         sx={{
-          position: "absolute",
+          position: "fixed",
           left: 0,
           bottom: 0,
-          margin: (t) => t.spacing(2),
+          margin: 2,
         }}
         color="primary"
         onClick={onClick}
