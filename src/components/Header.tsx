@@ -24,9 +24,11 @@ import DeleteBoard from "@components/Modals/boards/DeleteBoard";
 import LogoIcon from "@icons/LogoIcon";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 // hooks
 import useBoard from "@hooks/useBoard";
+import EditBoard from "./Modals/boards/EditBoard";
 
 function AppBar({ children }: { children: React.ReactNode }) {
   const style: SxProps<Theme> = {
@@ -76,6 +78,9 @@ function MoreMenu() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
 
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
   return (
     <>
       <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
@@ -86,16 +91,23 @@ function MoreMenu() {
         anchorEl={anchorEl}
         onClose={() => setAnchorEl(null)}
       >
-        <MenuItem>
+        <MenuItem onClick={() => setIsEditOpen(true)}>
           <ListItemIcon>
             <EditIcon />
           </ListItemIcon>
           <ListItemText primary={<Typography>Edit Board</Typography>} />
         </MenuItem>
-        <MenuItem>
-          <DeleteBoard />
+        <MenuItem onClick={() => setIsDeleteOpen(true)}>
+          <ListItemIcon>
+            <DeleteIcon color="warning" />
+          </ListItemIcon>
+          <ListItemText
+            primary={<Typography color="warning.main">Delete Board</Typography>}
+          />
         </MenuItem>
       </Menu>
+      <EditBoard isOpen={isEditOpen} close={() => setIsEditOpen(false)} />
+      <DeleteBoard isOpen={isDeleteOpen} close={() => setIsDeleteOpen(false)} />
     </>
   );
 }

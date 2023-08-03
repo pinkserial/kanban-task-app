@@ -13,7 +13,7 @@ import {
   MenuItem,
   Select,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import CheckIcon from "@mui/icons-material/Check";
@@ -38,6 +38,10 @@ export default function AddTask() {
   const [task, setTask] = useState<Task>(() =>
     initialTask(board.columns[0].name)
   );
+
+  useEffect(() => {
+    setTask(initialTask(board.columns[0].name));
+  }, [board]);
 
   const [open, setOpen] = useState(false);
 

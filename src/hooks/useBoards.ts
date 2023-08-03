@@ -128,6 +128,7 @@ const useBoardsStore = create(
         }
 
         const column = activeBoard.columns[columnId];
+
         column.tasks = column.tasks.filter((_, i) => i !== taskId);
       }),
 
@@ -157,6 +158,7 @@ const useBoardsStore = create(
         const destColumn = board.columns[destColumnIndex];
 
         const [removed] = srcColumn.tasks.splice(srcTaskIndex, 1);
+        removed.status = destColumn.name;
         destColumn.tasks.splice(destTaskIndex, 0, removed);
       }),
   }))

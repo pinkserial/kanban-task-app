@@ -33,7 +33,7 @@ const Contents = styled("main")<{
 
 export default function Dashboard() {
   const board = useBoard();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const reorder = useBoardsStore((state) => state.reorder);
   const move = useBoardsStore((state) => state.move);
 

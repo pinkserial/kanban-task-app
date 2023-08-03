@@ -1,57 +1,51 @@
 import useBoardsStore from "@hooks/useBoards";
 import {
-  Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
-  ListItemIcon,
-  ListItemText,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { useState } from "react";
 
 interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
   colIndex: number;
   index: number;
   title: string;
-  close: () => void;
 }
 
-export default function DeleteTask({ colIndex, index, title, close }: Props) {
-  const [open, setOpen] = useState(false);
-
+export default function DeleteTask({
+  isOpen,
+  onClose,
+  onConfirm,
+  colIndex,
+  index,
+  title,
+}: Props) {
   return (
-    <>
-      <Box sx={{ display: "flex" }} onClick={() => setOpen(true)}>
-        <ListItemIcon>
-          <DeleteIcon />
-        </ListItemIcon>
-        <ListItemText>Delete Task</ListItemText>
-      </Box>
-      <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>Delete this task?</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete the "{title}" task and its subtasks?
-            This action cannot be reversed.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <CancelButton close={() => setOpen(false)} />
-          <DeleteButton
-            colIndex={colIndex}
-            index={index}
-            close={() => {
-              setOpen(false);
-              close();
-            }}
-          />
-        </DialogActions>
-      </Dialog>
-    </>
+    <Dialog open={isOpen} onClose={onClose}>
+      <DialogTitle color="warning.main">Delete this task?</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Are you sure you want to delete the "{title}" task and its subtasks?
+          This action cannot be reversed.
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <CancelButton close={onClose} />
+        <DeleteButton
+          colIndex={colIndex}
+          index={index}
+          close={() => {
+            onClose();
+            onConfirm();
+          }}
+        />
+      </DialogActions>
+    </Dialog>
   );
 }
 

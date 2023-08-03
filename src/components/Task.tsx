@@ -41,7 +41,6 @@ export default function Task({ colIndex, index, task }: Props) {
           </Paper>
         )}
       </Draggable>
-
       <DetailTask
         open={open}
         close={dialogClose}

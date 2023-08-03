@@ -2,7 +2,7 @@ import useBoard from "@hooks/useBoard";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -27,6 +27,10 @@ export default function EditBoard({ isOpen, close }: Props) {
   const board = useBoard() as Board;
   const editBoard = useBoardsStore((state) => state.editBoard);
   const [editedboard, setEditedboard] = useState<Board>({ ...board });
+
+  useEffect(() => {
+    setEditedboard({ ...board });
+  }, [board]);
 
   return (
     <Dialog fullWidth open={isOpen} onClose={close}>
@@ -56,7 +60,7 @@ export default function EditBoard({ isOpen, close }: Props) {
             }
           >
             {editedboard.columns.map((column, index) => (
-              <ListItem sx={{ px: 0 }}>
+              <ListItem key={index} sx={{ px: 0 }}>
                 <TextField
                   fullWidth
                   size="small"

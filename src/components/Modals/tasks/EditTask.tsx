@@ -1,9 +1,7 @@
 import useBoardStore from "@hooks/useBoards";
-import Box from "@mui/material/Box";
+
 import { useState } from "react";
-import EditIcon from "@mui/icons-material/Edit";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
+
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -24,145 +22,146 @@ import CloseIcon from "@mui/icons-material/Close";
 import CancelButton from "@components/Buttons/Cancel";
 
 interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
   task: Task;
-  close: () => void;
   colIndex: number;
   index: number;
 }
 
-export default function EditTask({ task, close, colIndex, index }: Props) {
+export default function EditTask({
+  isOpen,
+  onClose,
+  onConfirm,
+  task,
+  colIndex,
+  index,
+}: Props) {
   const board = useBoard() as Board;
-  const [open, setOpen] = useState(false);
   const editTask = useBoardStore((state) => state.editTask);
   const [editedTask, setEditedTask] = useState(task);
 
   return (
-    <>
-      <Box sx={{ display: "flex" }} onClick={() => setOpen(true)}>
-        <ListItemIcon>
-          <EditIcon />
-        </ListItemIcon>
-        <ListItemText>Edit Task</ListItemText>
-      </Box>
-      <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>Edit Task</DialogTitle>
-        <DialogContent>
-          <TextField
-            required
-            fullWidth
-            variant="outlined"
-            margin="dense"
-            label="Task Name"
-            value={editedTask.title}
-            onChange={(e) =>
-              setEditedTask(
-                produce((draft) => {
-                  draft.title = e.target.value;
-                })
-              )
-            }
-            placeholder="Take coffee break"
-          />
-          <TextField
-            fullWidth
-            variant="outlined"
-            margin="dense"
-            label="Description"
-            multiline
-            value={editedTask.description}
-            onChange={(e) =>
-              setEditedTask(
-                produce((draft) => {
-                  draft.description = e.target.value;
-                })
-              )
-            }
-            rows={4}
-          />
-          <Stack>
-            {editedTask.subtasks.map((subtask, idx) => (
-              <Paper
-                key={idx}
-                sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                elevation={0}
-              >
-                <TextField
-                  size="small"
-                  value={subtask.title}
-                  fullWidth
-                  label="Subtask"
-                  onChange={(e) =>
-                    setEditedTask(
-                      produce((draft) => {
-                        draft.subtasks[idx].title = e.target.value;
-                        draft.subtasks[idx].isCompleted = false;
-                      })
-                    )
-                  }
-                />
-                <IconButton
-                  onClick={() => {
-                    setEditedTask(
-                      produce((draft) => {
-                        draft.subtasks.splice(idx, 1);
-                      })
-                    );
-                  }}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </Paper>
-            ))}
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() =>
-                setEditedTask(
-                  produce((draft) => {
-                    draft.subtasks.push({ title: "", isCompleted: false });
-                  })
-                )
-              }
+    <Dialog open={isOpen} onClose={onClose}>
+      <DialogTitle>Edit Task</DialogTitle>
+      <DialogContent>
+        <TextField
+          required
+          fullWidth
+          variant="outlined"
+          margin="dense"
+          label="Task Name"
+          value={editedTask.title}
+          onChange={(e) =>
+            setEditedTask(
+              produce((draft) => {
+                draft.title = e.target.value;
+              })
+            )
+          }
+          placeholder="Take coffee break"
+        />
+        <TextField
+          fullWidth
+          variant="outlined"
+          margin="dense"
+          label="Description"
+          multiline
+          value={editedTask.description}
+          onChange={(e) =>
+            setEditedTask(
+              produce((draft) => {
+                draft.description = e.target.value;
+              })
+            )
+          }
+          rows={4}
+        />
+        <Stack>
+          {editedTask.subtasks.map((subtask, idx) => (
+            <Paper
+              key={idx}
+              sx={{ display: "flex", alignItems: "center", gap: 1 }}
+              elevation={0}
             >
-              Add New Subtask
-            </Button>
-          </Stack>
-          {board.columns.length > 0 && (
-            <FormControl fullWidth margin="dense">
-              <InputLabel>Current Status</InputLabel>
-              <Select
-                label="Current Status"
-                value={editedTask.status}
-                onChange={(e) => {
+              <TextField
+                size="small"
+                value={subtask.title}
+                fullWidth
+                label="Subtask"
+                onChange={(e) =>
                   setEditedTask(
                     produce((draft) => {
-                      draft.status = e.target.value;
+                      draft.subtasks[idx].title = e.target.value;
+                      draft.subtasks[idx].isCompleted = false;
+                    })
+                  )
+                }
+              />
+              <IconButton
+                onClick={() => {
+                  setEditedTask(
+                    produce((draft) => {
+                      draft.subtasks.splice(idx, 1);
                     })
                   );
                 }}
               >
-                {board.columns.map((column, idx) => (
-                  <MenuItem key={idx} value={column.name}>
-                    {column.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <CancelButton close={() => setOpen(false)} />
+                <CloseIcon />
+              </IconButton>
+            </Paper>
+          ))}
           <Button
             variant="contained"
-            onClick={() => {
-              editTask(colIndex, index, editedTask);
-              close();
-            }}
+            startIcon={<AddIcon />}
+            onClick={() =>
+              setEditedTask(
+                produce((draft) => {
+                  draft.subtasks.push({ title: "", isCompleted: false });
+                })
+              )
+            }
           >
-            Confirm
+            Add New Subtask
           </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+        </Stack>
+        {board.columns.length > 0 && (
+          <FormControl fullWidth margin="dense">
+            <InputLabel>Current Status</InputLabel>
+            <Select
+              label="Current Status"
+              value={editedTask.status}
+              onChange={(e) => {
+                setEditedTask(
+                  produce((draft) => {
+                    draft.status = e.target.value;
+                  })
+                );
+              }}
+            >
+              {board.columns.map((column, idx) => (
+                <MenuItem key={idx} value={column.name}>
+                  {column.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+      </DialogContent>
+      <DialogActions>
+        <CancelButton close={onClose} />
+        <Button
+          variant="contained"
+          onClick={() => {
+            editTask(colIndex, index, editedTask);
+            onClose();
+            onConfirm();
+          }}
+        >
+          Confirm
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 }
