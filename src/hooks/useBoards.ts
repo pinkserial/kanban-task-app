@@ -13,10 +13,6 @@ type Actions = {
   editBoard: (board: Board) => void;
   deleteBoard: () => void;
 
-  // column actions
-  addColumn: (column: Column) => void;
-  editColumn: (columnId: number, column: Column) => void;
-
   // task actions
   addTask: (columnId: number, task: Task) => void;
   editTask: (columnId: number, taskId: number, task: Task) => void;
@@ -72,33 +68,6 @@ const useBoardsStore = create(
     deleteBoard: () =>
       set((state) => {
         state.boards = state.boards.filter((board) => !board.isActive);
-      }),
-
-    addColumn: (column) =>
-      set((state) => {
-        const activeBoard = state.boards.find((board) => board.isActive);
-
-        if (!activeBoard) {
-          return new Error("No Active Board");
-        }
-
-        activeBoard.columns.push(column);
-      }),
-
-    editColumn: (columnId, column) =>
-      set((state) => {
-        const activeBoard = state.boards.find((board) => board.isActive);
-
-        if (!activeBoard) {
-          return new Error("No Active Board");
-        }
-
-        const currentColumn = activeBoard.columns[columnId];
-
-        const { name, tasks } = column;
-
-        currentColumn.name = name;
-        currentColumn.tasks = tasks;
       }),
 
     addTask: (columnId, task) =>

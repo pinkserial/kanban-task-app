@@ -11,9 +11,6 @@ import NoBoard from "./NoBoard";
 import useBoard from "@hooks/useBoard";
 import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import useBoardsStore from "@hooks/useBoards";
-import Paper from "@mui/material/Paper";
-import Button from "@mui/material/Button";
-import { Typography } from "@mui/material";
 import NewColumn from "./NewColumn";
 
 const Contents = styled("main")<{

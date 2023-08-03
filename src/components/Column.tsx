@@ -15,7 +15,7 @@ interface Props {
 export default function Column({ index: colIndex, column }: Props) {
   return (
     <Droppable droppableId={`${colIndex}`}>
-      {(provided, snapshot) => (
+      {(provided) => (
         <div
           ref={provided.innerRef}
           {...provided.droppableProps}
